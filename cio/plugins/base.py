@@ -24,6 +24,12 @@ class BasePlugin(object):
         """
         return data
 
+    def publish(self, node):
+        """
+        Perform actions on publish and return node to persist
+        """
+        return node
+
     def delete(self, data):
         """
         Delete external plugin resources

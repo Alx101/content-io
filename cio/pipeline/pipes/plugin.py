@@ -41,6 +41,16 @@ class PluginPipe(BasePipe):
     def set_response(self, response):
         return self.render_response(response)
 
+    def publish_request(self, request):
+        for uri, node in list(request.items()):
+            try:
+                plugin = plugins.resolve(uri)
+            except UnknownPlugin:
+                pass
+                # TODO: Should we maybe raise here?
+            else:
+                node = plugin.publish(node)
+
     def publish_response(self, response):
         return self.render_response(response)
 
