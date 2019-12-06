@@ -18,6 +18,15 @@ class BasePlugin(object):
         """
         return content
 
+    def loads(self, node):
+        """
+        Return plugin data and modify for raw node
+        """
+        source = node.pop('content')
+        data = node['data'] = self.load(source)
+        node['content'] = self.render(data)
+        return node
+
     def save(self, data):
         """
         Persist external plugin resources and return content string for plugin data
