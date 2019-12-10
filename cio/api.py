@@ -93,6 +93,7 @@ def load(uri):
     node = None
 
     def uri_chain(uri):
+        uri = uri.clone(query=None)
         if uri.version:
             yield uri
         if uri.version != 'draft':
