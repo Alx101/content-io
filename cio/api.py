@@ -107,6 +107,8 @@ def load(uri):
         except NodeDoesNotExist:
             continue
         else:
+            # Add potential query params for plugin resolve
+            node['uri'] = URI(node['uri'], query=uri.query)
             break
 
     if node:
