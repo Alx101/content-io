@@ -52,6 +52,57 @@ class UtilsTest(BaseTest):
         self.assertEqual(uri, 'i18n://sv@page/title.txt#draft')
         self.assertEqual(uri.version, 'draft')
 
+    def test_uri_query_params(self):
+        # Verify query params are snatched up
+        uri = URI('i18n://sv@page/title.txt?var=someval')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?var=someval')
+        self.assertDictEqual(uri.query, {
+            'var': 'someval'
+        })
+
+        # Verify multiple query parameters are handled
+        uri = URI('i18n://sv@page/title.txt?var=someval&second=2')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?var=someval&second=2')
+        self.assertDictEqual(uri.query, {
+            'var': 'someval',
+            'second': '2',
+        })
+
+        # Verify query params can be replaced when cloned
+        uri = uri.clone(query={
+            'var': 'newval',
+            'second': '1'
+        })
+        self.assertDictEqual(uri.query, {
+            'var': 'newval',
+            'second': '1'
+        })
+
+        # Verify unicode strings are handled correctly
+        uri = URI(u'i18n://sv@page/title.txt?fox=räv')
+        self.assertEqual(uri, u'i18n://sv@page/title.txt?fox=räv')
+        self.assertDictEqual(uri.query, {
+            'fox': u'räv'
+        })
+
+
+        # Verify query parameter order
+        uri = URI(u'i18n://sv@page/title.txt?fox=1&variable=2&last=3')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox=1&variable=2&last=3')
+        self.assertDictEqual(uri.query, {
+            'fox': '1',
+            'variable': '2',
+            'last': '3'
+        })
+
+        # Verify empty variables are handled correctly
+        uri = URI(u'i18n://sv@page/title.txt?fox=&variable')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox=&variable=')
+        self.assertDictEqual(uri.query, {
+            'fox': '',
+            'variable': ''
+        })
+
     def test_formatter(self):
         tests = [
             (u"These are no variables: {} {0} {x} {x:f} {x!s} {x!r:.2f} { y } {{ y }}", {}, None),
