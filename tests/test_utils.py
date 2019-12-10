@@ -5,7 +5,8 @@ from cio.utils.formatters import ContentFormatter
 from cio.utils.uri import URI
 from cio.utils.imports import import_class
 from tests import BaseTest
-
+from six.moves.urllib.parse import quote_plus
+import six
 
 class UtilsTest(BaseTest):
 
@@ -60,6 +61,13 @@ class UtilsTest(BaseTest):
             'var': 'someval'
         })
 
+        # Verify query params work with version
+        uri = URI('i18n://sv@page/title.txt?var=someval#2')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?var=someval#2')
+        self.assertDictEqual(uri.query, {
+            'var': 'someval'
+        })
+
         # Verify multiple query parameters are handled
         uri = URI('i18n://sv@page/title.txt?var=someval&second=2')
         self.assertEqual(uri, 'i18n://sv@page/title.txt?var=someval&second=2')
@@ -79,11 +87,12 @@ class UtilsTest(BaseTest):
         })
 
         # Verify unicode strings are handled correctly
-        uri = URI(u'i18n://sv@page/title.txt?fox=räv')
-        self.assertEqual(uri, u'i18n://sv@page/title.txt?fox=räv')
+        value = u'räv'.encode('utf-8')
+        uri = URI('i18n://sv@page/title.txt?fox='+quote_plus(value))
         self.assertDictEqual(uri.query, {
-            'fox': u'räv'
+            u'fox': u'räv'
         })
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox='+quote_plus(value))
 
 
         # Verify query parameter order
@@ -101,6 +110,14 @@ class UtilsTest(BaseTest):
         self.assertDictEqual(uri.query, {
             'fox': '',
             'variable': ''
+        })
+
+        # Verify delimiters as values and/or keys
+        value = u'i18n://sv@page/title.txt#1'.encode('utf-8')
+        uri = URI('i18n://sv@page/title.txt?fox='+quote_plus(value))
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox='+quote_plus(value))
+        self.assertDictEqual(uri.query, {
+            'fox': u'i18n://sv@page/title.txt#1'
         })
 
     def test_formatter(self):

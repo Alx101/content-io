@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from ..conf import settings
 from collections import OrderedDict
 import six
-from six.moves.urllib.parse import parse_qs, urlencode, unquote, quote
+from six.moves.urllib.parse import parse_qs, urlencode, unquote_plus, quote_plus
 
 
 class URI(six.text_type):
@@ -20,34 +20,37 @@ class URI(six.text_type):
     @classmethod
     def _parse(cls, uri):
         base, _, version = uri.partition(settings.URI_VERSION_SEPARATOR)
+
+        query = OrderedDict()
+        if settings.URI_QUERY_SEPARATOR in base:
+            _base, _, querystring = base.rpartition(settings.URI_QUERY_SEPARATOR)
+            querystring = str(querystring)
+            query_holder = parse_qs(querystring, keep_blank_values=True)
+            if query_holder is '':
+                query = OrderedDict()
+            else:
+                reference_parts = querystring.split('&')
+                for pair in reference_parts:
+                    if '=' in pair:
+                        key, _, _ = pair.partition('=')
+                    else:
+                        key = pair
+                    if key is not '':
+                        value = query_holder[key]
+                        if len(value) > 0:
+                            query[key] = value[len(value)-1].decode('utf-8') if six.PY2 else value[len(value)-1]
+                        else:
+                            query[key] = []
+            base = _base
+        else:
+            query = OrderedDict()
+
         scheme, _, path = base.rpartition(settings.URI_SCHEME_SEPARATOR)
         namespace, _, path = path.rpartition(settings.URI_NAMESPACE_SEPARATOR)
         _path, _, ext = path.rpartition(settings.URI_EXT_SEPARATOR)
-        query = OrderedDict()
         if '/' in ext:
             ext = ''
         else:
-            if '?' in ext:
-                _ext, _, querystring = ext.rpartition(settings.URI_QUERY_SEPARATOR)
-                query_holder = parse_qs(querystring, keep_blank_values=True)
-                if query_holder is '':
-                    query = OrderedDict()
-                else:
-                    reference_parts = querystring.split('&')
-                    for pair in reference_parts:
-                        if '=' in pair:
-                            key, _, _ = pair.partition('=')
-                        else:
-                            key = pair
-                        if key is not '':
-                            value = query_holder[key]
-                            if len(value) == 1:
-                                query[key] = value[0]
-                            else:
-                                query[key] = value
-                ext = _ext
-            else:
-                query = OrderedDict()
             path = _path
 
         if not path and ext:
@@ -76,20 +79,17 @@ class URI(six.text_type):
                 if ext:
                     yield settings.URI_EXT_SEPARATOR
                     yield ext
-                if version:
-                    yield settings.URI_VERSION_SEPARATOR
-                    yield version
                 if query:
                     yield settings.URI_QUERY_SEPARATOR
                     temp_query = OrderedDict()
                     for (key, item) in query.items():
                         new_key, new_item = cls._parse_query_param_pair(key, item)
                         temp_query[new_key] = new_item
-                    querystring = unquote(urlencode(temp_query, True))
-                    if six.PY2:
-                        yield querystring.decode('utf-8')
-                    else:
-                        yield querystring
+                    querystring = urlencode(temp_query)
+                    yield querystring
+                if version:
+                    yield settings.URI_VERSION_SEPARATOR
+                    yield version
 
         uri = six.text_type.__new__(cls, ''.join(parts_gen()))
         uri.scheme = scheme
