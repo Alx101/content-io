@@ -1,10 +1,9 @@
 # coding=utf-8
 from __future__ import unicode_literals
-from urlparse import parse_qs
-from urllib import urlencode, unquote, quote
 from ..conf import settings
 from collections import OrderedDict
 import six
+from six.moves.urllib.parse import parse_qs, urlencode, unquote, quote
 
 
 class URI(six.text_type):
@@ -86,7 +85,11 @@ class URI(six.text_type):
                     for (key, item) in query.items():
                         new_key, new_item = cls._parse_query_param_pair(key, item)
                         temp_query[new_key] = new_item
-                    yield unquote(urlencode(temp_query, True)).decode('utf-8')
+                    querystring = unquote(urlencode(temp_query, True))
+                    if six.PY2:
+                        yield querystring.decode('utf-8')
+                    else:
+                        yield querystring
 
         uri = six.text_type.__new__(cls, ''.join(parts_gen()))
         uri.scheme = scheme
