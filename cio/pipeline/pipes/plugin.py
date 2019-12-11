@@ -36,7 +36,7 @@ class PluginPipe(BasePipe):
                 pass
                 # TODO: Should we maybe raise here?
             else:
-                node.content = plugin.saves(node)
+                node = plugin.saves(node)
 
     def set_response(self, response):
         return self.render_response(response)

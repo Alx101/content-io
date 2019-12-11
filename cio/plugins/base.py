@@ -37,7 +37,8 @@ class BasePlugin(object):
         """
         Perform action on node, persist external plugin resources and return content string for plugin data
         """
-        return self.save(node.content)
+        node.content = self.save(node.content)
+        return node
 
     def publish(self, node):
         """
