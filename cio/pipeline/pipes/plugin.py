@@ -20,6 +20,8 @@ class PluginPipe(BasePipe):
                     node.uri
                 ))
             else:
+                node.data = plugin.load(node.content)
+                node.content = plugin.render(node.data)
                 node = plugin._load(node)
 
         return response

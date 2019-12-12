@@ -49,6 +49,12 @@ class Node(object):
 
     uri = property(get_uri, set_uri)
 
+    def get_content_at(self, index):
+        return self._content[index]
+
+    def get_content_stack_count(self):
+        return len(self._content)
+
     def get_content(self):
         return self._content[-1]
 

@@ -23,13 +23,14 @@ class BasePlugin(object):
         """
         Return plugin data and modify for raw node
         """
-        if isinstance(node, Node):
-            node.data = self.load(node.content)
-            node = self._render(node)
-        else:
-            source = node.pop('content')
-            node['data'] = self.load(source)
-            node = self._render(node)
+        # if isinstance(node, Node):
+
+        node.content = self.load(node.content)
+        node = self._render(node)
+        # else:
+        #     source = node.pop('content')
+        #     node['data'] = self.load(source)
+        #     node = self._render(node)
         return node
 
     def save(self, data):
@@ -73,9 +74,9 @@ class BasePlugin(object):
         """
         Prepares node for render
         """
-        if isinstance(node, Node):
-            node.content = self.render(node.data)
-            return node
-        else:
-            node['content'] = self.render(node['data'])
-            return node
+        #if isinstance(node, Node):
+        node.content = self.render(node.content)
+        return node
+        # else:
+        #     node['content'] = self.render(node['data'])
+        #     return node

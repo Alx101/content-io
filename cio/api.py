@@ -91,6 +91,7 @@ def revisions(uri):
 def load(uri):
     uri = URI(uri)
     node = None
+    data = None
 
     def uri_chain(uri):
         uri = uri.clone(query=None)
@@ -103,18 +104,23 @@ def load(uri):
     # Try to get node from storage in order: given version, draft, published
     for _uri in uri_chain(uri):
         try:
-            node = storage.get(_uri)
+            stored_node = storage.get(_uri)
         except NodeDoesNotExist:
             continue
         else:
             # Add potential query params for plugin resolve
-            node['uri'] = URI(node['uri']).clone(query=uri.query)
+            meta = stored_node.get('meta') or {}
+            node = Node(URI(stored_node['uri']).clone(query=uri.query), content=stored_node['content'], **meta)
             break
 
     if node:
         # Load node data with related plugin
-        plugin = plugins.resolve(node['uri'])  # May raise UnknownPlugin and should be handled outside api
+        plugin = plugins.resolve(node.uri)  # May raise UnknownPlugin and should be handled outside api
         node = plugin._load(node)
+        if node.get_content_stack_count() > 1:
+            data = node.get_content_at(-2)
+        else:
+            data = node.content
 
     else:
         # Initialize non-existing node without version
@@ -127,14 +133,14 @@ def load(uri):
         # Validate plugin existence
         plugins.resolve(uri)
 
-        node = {
-            'uri': uri,
-            'data': None,
-            'content': None,
-            'meta': {}
-        }
+        node = Node(uri)
 
-    return node
+    return {
+        'uri': node.uri,
+        'data': data,
+        'content': node.content,
+        'meta': node.meta
+    }
 
 
 def search(uri=None):
