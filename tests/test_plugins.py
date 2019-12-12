@@ -64,3 +64,7 @@ class PluginTest(BaseTest):
     def test_markdown(self):
         markdown = plugins.get('md')
         self.assertEqual(markdown.render('# Title'), '<h1>Title</h1>')
+
+    def test_markdown_handles_empty_data(self):
+        markdown = plugins.get('md')
+        self.assertEqual(markdown.render(None), None)

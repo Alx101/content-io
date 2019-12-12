@@ -120,6 +120,25 @@ class UtilsTest(BaseTest):
             'fox': u'i18n://sv@page/title.txt#1'
         })
 
+        # Verify multiple query params with same key return last entry
+        uri = URI('i18n://sv@page/title.txt?key=a&key=b&key=c')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?key=c')
+        self.assertDictEqual(uri.query, {
+            'key': 'c'
+        })
+
+        # Verify query string handles when no values are inputted
+        uri = URI('i18n://sv@page/title.txt?')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt')
+        self.assertEqual(uri.query, None)
+
+        # Verify query string handles when keys without values are inputted
+        uri = URI('i18n://sv@page/title.txt?key')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?key=')
+        self.assertEqual(uri.query, {
+            'key': ''
+        })
+
     def test_formatter(self):
         tests = [
             (u"These are no variables: {} {0} {x} {x:f} {x!s} {x!r:.2f} { y } {{ y }}", {}, None),

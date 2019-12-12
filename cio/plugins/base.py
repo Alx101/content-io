@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from cio.conf import settings
+from cio.node import Node
 
 
 class BasePlugin(object):
@@ -18,13 +19,17 @@ class BasePlugin(object):
         """
         return content
 
-    def loads(self, node):
+    def _load(self, node):
         """
         Return plugin data and modify for raw node
         """
-        source = node.pop('content')
-        data = node['data'] = self.load(source)
-        node['content'] = self.render(data)
+        if isinstance(node, Node):
+            node.data = self.load(node.content)
+            node = self._render(node)
+        else:
+            source = node.pop('content')
+            node['data'] = self.load(source)
+            node = self._render(node)
         return node
 
     def save(self, data):
@@ -33,7 +38,7 @@ class BasePlugin(object):
         """
         return data
 
-    def saves(self, node):
+    def _save(self, node):
         """
         Perform action on node, persist external plugin resources and return content string for plugin data
         """
@@ -52,8 +57,25 @@ class BasePlugin(object):
         """
         pass
 
+    def _delete(self, node):
+        """
+        Delete external plugin resources
+        """
+        self.delete(node.content)
+
     def render(self, data):
         """
         Render plugin
         """
         return data
+
+    def _render(self, node):
+        """
+        Prepares node for render
+        """
+        if isinstance(node, Node):
+            node.content = self.render(node.data)
+            return node
+        else:
+            node['content'] = self.render(node['data'])
+            return node

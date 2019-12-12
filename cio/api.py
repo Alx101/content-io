@@ -78,7 +78,7 @@ def publish(uri):
 
     # Publish draft if no specific version specified
     if not node.uri.version:
-        node.uri = node.uri.clone(version='draft')
+        uri = node.uri = node.uri.clone(version='draft')
 
     response = pipeline.send('publish', node)
     return response.get(uri)
@@ -114,7 +114,7 @@ def load(uri):
     if node:
         # Load node data with related plugin
         plugin = plugins.resolve(node['uri'])  # May raise UnknownPlugin and should be handled outside api
-        node = plugin.loads(node)
+        node = plugin._load(node)
 
     else:
         # Initialize non-existing node without version

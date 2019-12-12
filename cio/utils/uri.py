@@ -26,21 +26,18 @@ class URI(six.text_type):
             _base, _, querystring = base.rpartition(settings.URI_QUERY_SEPARATOR)
             querystring = str(querystring)
             query_holder = parse_qs(querystring, keep_blank_values=True)
-            if query_holder is '':
-                query = OrderedDict()
-            else:
-                reference_parts = querystring.split('&')
-                for pair in reference_parts:
-                    if '=' in pair:
-                        key, _, _ = pair.partition('=')
+            reference_parts = querystring.split('&')
+            for pair in reference_parts:
+                if '=' in pair:
+                    key, _, _ = pair.partition('=')
+                else:
+                    key = pair
+                if key is not '':
+                    value = query_holder[key]
+                    if len(value) > 0:
+                        query[key] = value[len(value)-1].decode('utf-8') if six.PY2 else value[len(value)-1]
                     else:
-                        key = pair
-                    if key is not '':
-                        value = query_holder[key]
-                        if len(value) > 0:
-                            query[key] = value[len(value)-1].decode('utf-8') if six.PY2 else value[len(value)-1]
-                        else:
-                            query[key] = []
+                        query[key] = []
             base = _base
         else:
             query = OrderedDict()
@@ -102,14 +99,14 @@ class URI(six.text_type):
 
     @classmethod
     def _parse_query_param_pair(cls, key, values):
-        if isinstance(values, list):
-            newvalues = [
-                value.encode('utf-8')
-                for value in values
-            ]
-            return key.encode('utf-8'), newvalues
-        else:
-            return key.encode('utf-8'), values.encode('utf-8')
+        # if isinstance(values, list):
+        #     newvalues = [
+        #         value.encode('utf-8')
+        #         for value in values
+        #     ]
+        #     return key.encode('utf-8'), newvalues
+        # else:
+        return key.encode('utf-8'), values.encode('utf-8')
 
     def is_absolute(self):
         """
