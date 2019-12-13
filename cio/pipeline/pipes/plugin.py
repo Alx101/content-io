@@ -7,6 +7,7 @@ from ...node import empty
 from ...plugins import plugins
 from ...plugins.exceptions import UnknownPlugin
 
+import logging
 
 class PluginPipe(BasePipe):
 
@@ -20,9 +21,8 @@ class PluginPipe(BasePipe):
                     node.uri
                 ))
             else:
-                node.data = plugin.load(node.content)
-                node.content = plugin.render(node.data)
-                node = plugin._load(node)
+                data = plugin._load(node)
+                node.content = plugin._render(data, node)
 
         return response
 
