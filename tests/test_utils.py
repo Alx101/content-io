@@ -85,6 +85,14 @@ class UtilsTest(BaseTest):
             'var': 'newval',
             'second': '1'
         })
+        exact_copy = uri.clone()
+        self.assertEqual(exact_copy, uri)
+        self.assertDictEqual(exact_copy.query, uri.query)
+        self.assertEqual(exact_copy.query['second'], '1')
+
+        # Verify replacement works
+        uri = URI('i18n://sv@page/title.txt?var=someval&second=2').clone(query=None)
+        self.assertEqual(uri.query, None)
 
         # Verify unicode strings are handled correctly
         value = u'räv'.encode('utf-8')
