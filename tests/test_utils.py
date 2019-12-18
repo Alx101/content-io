@@ -89,6 +89,7 @@ class UtilsTest(BaseTest):
         self.assertEqual(exact_copy, uri)
         self.assertDictEqual(exact_copy.query, uri.query)
         self.assertEqual(exact_copy.query['second'], '1')
+        self.assertNotEqual(id(exact_copy.query), id(uri.query))
 
         # Verify replacement works
         uri = URI('i18n://sv@page/title.txt?var=someval&second=2').clone(query=None)

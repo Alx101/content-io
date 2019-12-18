@@ -102,7 +102,7 @@ def load(uri):
         yield uri.clone(version=None)
 
     # Try to get node from storage in order: given version, draft, published
-    for _uri in uri_chain(uri.clone()):
+    for _uri in uri_chain(uri):
         try:
             stored_node = storage.get(_uri)
         except NodeDoesNotExist:

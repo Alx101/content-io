@@ -94,7 +94,7 @@ class URI(six.text_type):
         uri.path = path
         uri.ext = ext
         uri.version = version
-        uri.query = query
+        uri.query = dict(query) if query is not None else None
         return uri
 
     @classmethod
