@@ -7,7 +7,6 @@ from ...node import empty
 from ...plugins import plugins
 from ...plugins.exceptions import UnknownPlugin
 
-import logging
 
 class PluginPipe(BasePipe):
 

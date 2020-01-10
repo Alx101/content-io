@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from ..conf import settings
 from collections import OrderedDict
 import six
-from six.moves.urllib.parse import parse_qs, urlencode, unquote_plus, quote_plus
+from six.moves.urllib.parse import parse_qs, urlencode
 
 
 class URI(six.text_type):
@@ -32,10 +32,10 @@ class URI(six.text_type):
                     key, _, _ = pair.partition('=')
                 else:
                     key = pair
-                if key is not '':
+                if key != '':
                     value = query_holder[key]
                     if len(value) > 0:
-                        query[key] = value[len(value)-1].decode('utf-8') if six.PY2 else value[len(value)-1]
+                        query[key] = value[len(value) - 1].decode('utf-8') if six.PY2 else value[len(value) - 1]
                     else:
                         query[key] = []
             base = _base

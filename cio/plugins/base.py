@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from cio.conf import settings
-from cio.node import Node
 
 
 class BasePlugin(object):
