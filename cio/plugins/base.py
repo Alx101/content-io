@@ -61,7 +61,7 @@ class BasePlugin(object):
         """
         return data
 
-    def _render(self, data, node):
+    def _render(self, node, data):
         """
         Prepares node for render and returns rendered content
         """

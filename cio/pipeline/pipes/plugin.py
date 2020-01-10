@@ -21,7 +21,7 @@ class PluginPipe(BasePipe):
                 ))
             else:
                 data = plugin._load(node)
-                node.content = plugin._render(data, node)
+                node.content = plugin._render(node, data)
 
         return response
 

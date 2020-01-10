@@ -126,6 +126,6 @@ class ReplacerPlugin(BasePlugin):
         node.content = "REPLACED"
         return self.load(node.content)
 
-    def _render(self, data, node):
+    def _render(self, node, data):
         node.uri = node.uri.clone(path="page/rendered.rpl")
         return self.render(data)

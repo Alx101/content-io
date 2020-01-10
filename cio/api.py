@@ -117,7 +117,7 @@ def load(uri):
         # Load node data with related plugin
         plugin = plugins.resolve(node.uri)  # May raise UnknownPlugin and should be handled outside api
         data = plugin._load(node)
-        node.content = plugin._render(data, node)
+        node.content = plugin._render(node, data)
         # if node.get_content_stack_count() > 1:
         #     data = node.get_content_at(-2)
         # else:
