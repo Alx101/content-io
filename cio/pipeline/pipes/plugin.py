@@ -49,7 +49,7 @@ class PluginPipe(BasePipe):
                 pass
                 # TODO: Should we maybe raise here?
             else:
-                node = plugin.publish(node)
+                node = plugin._publish(node)
 
     def publish_response(self, response):
         return self.render_response(response)

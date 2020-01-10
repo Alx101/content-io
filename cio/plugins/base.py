@@ -37,7 +37,7 @@ class BasePlugin(object):
         node.content = self.save(node.content)
         return node
 
-    def publish(self, node):
+    def _publish(self, node):
         """
         Perform actions on publish and return node to persist
         """
