@@ -19,19 +19,22 @@ class URI(six.text_type):
 
     @classmethod
     def _parse(cls, uri):
-        base, _, version = uri.partition(settings.URI_VERSION_SEPARATOR)
+        if isinstance(uri, six.binary_type):
+            uri = uri.decode('utf-8')
 
         query = None
+        base, _, version = uri.partition(settings.URI_VERSION_SEPARATOR)
         base, _, querystring = base.partition(settings.URI_QUERY_SEPARATOR)
+
         if querystring:
             query = OrderedDict()
             variable_pairs = querystring.split(settings.URI_QUERY_PARAMETER_SEPARATOR)
             for pair in variable_pairs:
                 if not pair:
                     continue
-                key, _, val = pair.partition(settings.URI_QUERY_VARIABLE_SEPARATOR)
-                value = unquote_plus(val)
-                key = unquote_plus(key)
+                key, _, value = pair.partition(settings.URI_QUERY_VARIABLE_SEPARATOR)
+                key = unquote(key)
+                value = unquote(value)
                 query[key] = [value] if value else []
 
         scheme, _, path = base.rpartition(settings.URI_SCHEME_SEPARATOR)
@@ -73,15 +76,15 @@ class URI(six.text_type):
                     for i, (key, value) in enumerate(query.items()):
                         if i:
                             yield settings.URI_QUERY_PARAMETER_SEPARATOR
-                        yield quote_plus(key)
+                        yield quote(key)
                         yield settings.URI_QUERY_VARIABLE_SEPARATOR
                         if value:
-                            yield quote_plus(value[0])
+                            yield quote(value[0])
                 if version:
                     yield settings.URI_VERSION_SEPARATOR
                     yield version
 
-        uri = six.text_type.__new__(cls, ''.join(parts_gen()))
+        uri = six.text_type.__new__(cls, u''.join(parts_gen()))
         uri.scheme = scheme
         uri.namespace = namespace
         uri.path = path
@@ -106,3 +109,19 @@ class URI(six.text_type):
 
     class Invalid(Exception):
         pass
+
+
+def quote(string):
+    if isinstance(string, six.text_type):
+        string = string.encode('utf-8')
+    return quote_plus(string)
+
+
+def unquote(string):
+    if six.PY2 and isinstance(string, six.text_type):
+        string = unquote_plus(string.encode('utf-8'))
+    else:
+        string = unquote_plus(string)
+    if isinstance(string, six.binary_type):
+        string = string.decode('utf-8')
+    return string

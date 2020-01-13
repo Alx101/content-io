@@ -1,12 +1,11 @@
 # coding=utf-8
+import six
 from cio import lazy_shortcut
 from cio.conf import settings
 from cio.utils.formatters import ContentFormatter
-from cio.utils.uri import URI
+from cio.utils.uri import URI, quote
 from cio.utils.imports import import_class
 from tests import BaseTest
-from six.moves.urllib.parse import quote_plus
-import six
 
 class UtilsTest(BaseTest):
 
@@ -96,16 +95,16 @@ class UtilsTest(BaseTest):
         self.assertEqual(uri.query, None)
 
         # Verify unicode strings are handled correctly
-        value = u'räv'.encode('utf-8')
-        uri = URI('i18n://sv@page/title.txt?fox='+quote_plus(value))
+        value = quote(u'räv')
+        unicode_uri = u'i18n://sv@page/title.txt?fox=' + value
+        uri = URI(unicode_uri.encode('utf-8'))
+        self.assertEqual(uri, unicode_uri)
         self.assertDictEqual(uri.query, {
             u'fox': [u'räv']
         })
-        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox='+quote_plus(value))
-
 
         # Verify query parameter order
-        uri = URI(u'i18n://sv@page/title.txt?fox=1&variable=2&last=3')
+        uri = URI(b'i18n://sv@page/title.txt?fox=1&variable=2&last=3')
         self.assertEqual(uri, 'i18n://sv@page/title.txt?fox=1&variable=2&last=3')
         self.assertDictEqual(uri.query, {
             'fox': ['1'],
@@ -122,9 +121,10 @@ class UtilsTest(BaseTest):
         })
 
         # Verify delimiters as values and/or keys
-        value = u'i18n://sv@page/title.txt#1'.encode('utf-8')
-        uri = URI('i18n://sv@page/title.txt?fox='+quote_plus(value))
-        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox='+quote_plus(value))
+        value = quote(u'i18n://sv@page/title.txt#1')
+        unicode_uri = u'i18n://sv@page/title.txt?fox=' + value
+        uri = URI(unicode_uri.encode('utf-8'))
+        self.assertEqual(uri, unicode_uri)
         self.assertDictEqual(uri.query, {
             'fox': [u'i18n://sv@page/title.txt#1']
         })
