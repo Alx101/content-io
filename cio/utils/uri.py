@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from ..conf import settings
 from collections import OrderedDict
 import six
-from six.moves.urllib.parse import urlencode, unquote_plus, quote_plus
+from six.moves.urllib.parse import unquote_plus, quote_plus
 
 
 class URI(six.text_type):
