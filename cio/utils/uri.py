@@ -21,9 +21,10 @@ class URI(six.text_type):
     def _parse(cls, uri):
         base, _, version = uri.partition(settings.URI_VERSION_SEPARATOR)
 
-        query = OrderedDict()
+        query = None
         base, _, querystring = base.partition(settings.URI_QUERY_SEPARATOR)
         if querystring:
+            query = OrderedDict()
             variable_pairs = querystring.split(settings.URI_QUERY_PARAMETER_SEPARATOR)
             for pair in variable_pairs:
                 if not pair:
